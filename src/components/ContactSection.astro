@@ -1,7 +1,7 @@
 ---
 import type { Lang } from '../i18n';
 import { t } from '../i18n';
-import { siteConfig, formspreeEndpoint, whatsappUrl } from '../config/site';
+import { siteConfig, web3formsEndpoint, whatsappUrl } from '../config/site';
 import SelectedServicesBadges from './SelectedServicesBadges.tsx';
 
 interface Props { lang: Lang; }
@@ -27,11 +27,13 @@ const labels = {
     <div class="grid">
       <form
         class="form"
-        action={formspreeEndpoint()}
+        action={web3formsEndpoint()}
         method="POST"
         data-form
         novalidate
       >
+        {/* Web3Forms — obavezni Access Key (javan, vezan na tvoj email). */}
+        <input type="hidden" name="access_key" value={siteConfig.web3forms.accessKey} />
         <SelectedServicesBadges
           client:load
           labels={labels}
@@ -58,7 +60,8 @@ const labels = {
         {/* Honeypot polje — botovi ga ispune, ljudi ne */}
         <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="gotcha" aria-hidden="true" />
 
-        <input type="hidden" name="_subject" value={`INVERZ — novi upit (${lang.toUpperCase()})`} />
+        <input type="hidden" name="subject" value={`INVERZ — novi upit (${lang.toUpperCase()})`} />
+        <input type="hidden" name="from_name" value="INVERZ web" />
 
         <button class="submit" type="submit" data-submit>
           <span data-submit-default>{d.contact.fields.submit}</span>

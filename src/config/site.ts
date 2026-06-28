@@ -33,12 +33,13 @@ export const siteConfig = {
   },
 
   /**
-   * Formspree — slanje kontakt forme bez vlastitog backenda.
-   * Otvori račun na formspree.io, kreiraj formu i ovdje upiši ID
-   * iz njihove POST URL adrese: https://formspree.io/f/{ID}.
+   * Web3Forms — slanje kontakt forme bez vlastitog backenda.
+   * Otvori web3forms.com, upiši svoj email i potvrdi ga, pa ovdje
+   * zalijepi Access Key (izgleda kao UUID: xxxxxxxx-xxxx-...).
+   * Ključ je javan (smije biti u kodu) — vezan je samo na tvoj email.
    */
-  formspree: {
-    id: 'mykvvykd',              // PLACEHOLDER — ZAMIJENI
+  web3forms: {
+    accessKey: '75c9769b-92ad-48cf-a3f1-51f94b5c9df2',
   },
 } as const;
 
@@ -50,7 +51,7 @@ export function whatsappUrl(message?: string): string {
   return message ? `${base}?text=${encodeURIComponent(message)}` : base;
 }
 
-/** Helper: vraća puni Formspree endpoint. */
-export function formspreeEndpoint(): string {
-  return `https://formspree.io/f/${siteConfig.formspree.id}`;
+/** Helper: Web3Forms endpoint (uvijek isti za sve). */
+export function web3formsEndpoint(): string {
+  return 'https://api.web3forms.com/submit';
 }
