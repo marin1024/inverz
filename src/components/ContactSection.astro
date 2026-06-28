@@ -57,8 +57,9 @@ const labels = {
           <textarea id="f-message" name="message" rows="6" required></textarea>
         </div>
 
-        {/* Honeypot polje — botovi ga ispune, ljudi ne */}
-        <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="gotcha" aria-hidden="true" />
+        {/* Web3Forms honeypot (botcheck) — skriven; bot ga označi, čovjek ne.
+            Web3Forms ovakvu prijavu odbija na serveru, a JS je filtrira i lokalno. */}
+        <input type="checkbox" name="botcheck" tabindex="-1" autocomplete="off" class="gotcha" aria-hidden="true" />
 
         <input type="hidden" name="subject" value={`INVERZ — novi upit (${lang.toUpperCase()})`} />
         <input type="hidden" name="from_name" value="INVERZ web" />
@@ -110,9 +111,9 @@ const labels = {
         return;
       }
 
-      // Honeypot zaštita
-      const gotcha = form.querySelector<HTMLInputElement>('input[name="_gotcha"]');
-      if (gotcha && gotcha.value) return; // tiho ignoriraj bota
+      // Honeypot zaštita (Web3Forms botcheck) — bot označi checkbox, čovjek ne.
+      const botcheck = form.querySelector<HTMLInputElement>('input[name="botcheck"]');
+      if (botcheck && botcheck.checked) return; // tiho ignoriraj bota
 
       submitBtn?.setAttribute('disabled', '');
       if (sDefault) sDefault.hidden = true;
