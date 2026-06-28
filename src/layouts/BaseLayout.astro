@@ -1,0 +1,93 @@
+---
+// Učitavanje lokalnih fontova preko npm paketa — bez Google CDN-a.
+import '@fontsource-variable/inter';
+import '@fontsource-variable/space-grotesk';
+import '@fontsource/syncopate/700.css';
+
+import '../styles/global.css';
+
+import DotsBackground from '../components/DotsBackground.astro';
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+
+interface Props {
+  /** 'hr' (zadani) ili 'en' — postavlja <html lang>. */
+  lang: Lang;
+  /** URL ekvivalentne stranice u drugom jeziku (za prebacivač i hreflang). */
+  altUrl: string;
+  /** Title taga — ako se ne preda, koristi se prijevod meta.title. */
+  title?: string;
+  /** Meta description — ako se ne preda, koristi se prijevod meta.description. */
+  description?: string;
+  /** Kanonički URL stranice (puni, s domenom). Ako se ne preda, ne emitiraj. */
+  canonical?: string;
+}
+
+const { lang, altUrl, title, description, canonical } = Astro.props;
+const dict = t(lang);
+const pageTitle = title ?? dict.meta.title;
+const pageDesc = description ?? dict.meta.description;
+const otherLangCode = lang === 'hr' ? 'en' : 'hr';
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="description" content={pageDesc} />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    {canonical && <link rel="canonical" href={canonical} />}
+
+    <link rel="alternate" hreflang={lang} href={canonical ?? Astro.url.pathname} />
+    <link rel="alternate" hreflang={otherLangCode} href={altUrl} />
+    <link rel="alternate" hreflang="x-default" href="/" />
+
+    <!-- Open Graph (osnovno) -->
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={pageDesc} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={lang === 'hr' ? 'hr_HR' : 'en_GB'} />
+
+    <title>{pageTitle}</title>
+
+    {/* ───── Perzistentni izbor jezika ─────
+        Trči prije renderiranja: ako je korisnik ranije ručno odabrao drugi
+        jezik, preusmjeri ga na ekvivalent. Klik na prebacivač sprema novi
+        izbor PRIJE navigacije, pa nakon dolaska localStorage match = no-op. */}
+    <script is:inline define:vars={{ currentLang: lang, altUrl }}>
+      try {
+        var saved = localStorage.getItem('inverz_lang');
+        if (saved && saved !== currentLang && saved === (currentLang === 'hr' ? 'en' : 'hr')) {
+          window.location.replace(altUrl);
+        }
+      } catch (_) {}
+    </script>
+  </head>
+  <body>
+    <DotsBackground />
+    <a href="#main" class="skip-link">{dict.ariaSkipToContent}</a>
+    <slot />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    background: var(--color-fg);
+    color: var(--color-bg);
+    padding: var(--space-2) var(--space-4);
+    border: 0;
+    z-index: 100;
+  }
+  .skip-link:focus {
+    left: var(--space-4);
+    top: var(--space-4);
+    box-shadow: none;
+    outline: 2px solid var(--color-fg);
+  }
+</style>

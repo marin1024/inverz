@@ -1,0 +1,25 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import Hero from '../components/Hero.astro';
+import ServicesSection from '../components/ServicesSection.astro';
+import HowIWork from '../components/HowIWork.astro';
+import ProjectsSection from '../components/ProjectsSection.astro';
+// Privremeno skriveno dok ne dodam objave — vrati import kad bude sadržaja.
+// import PostsPreview from '../components/PostsPreview.astro';
+import ContactSection from '../components/ContactSection.astro';
+import { altLangUrl } from '../i18n';
+
+const lang = 'hr';
+const altUrl = altLangUrl(lang, '/');
+---
+
+<PageLayout lang={lang} altUrl={altUrl} canonical="https://inverz.hr/">
+  <Hero lang={lang} />
+  <ServicesSection lang={lang} />
+  <HowIWork lang={lang} />
+  <ProjectsSection lang={lang} />
+  {/* Sekcija "04 · Objave" skrivena dok nema sadržaja. Vrati ovaj redak (i
+      vrati numeraciju u i18n: kontakt → 05, objave → 04) kad dodaš objave. */}
+  {/* <PostsPreview lang={lang} /> */}
+  <ContactSection lang={lang} />
+</PageLayout>

@@ -1,0 +1,158 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  /** Entry iz content collection-a — preda ga pages/[slug].astro. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  project: any;
+}
+
+const { lang, project } = Astro.props;
+const d = t(lang);
+const { Content } = await render(project);
+
+// Nema liste projekata — natrag vodi na sekciju na homepageu.
+const backHref = lang === 'hr' ? '/#projekti' : '/en/#projekti';
+---
+
+<article class="project-article">
+  <div class="inner">
+    <a class="back" href={backHref}>{d.projects.backToList}</a>
+
+    <header class="project-head">
+      {project.data.logo && (
+        <div class="logo">
+          <Image src={project.data.logo} alt={project.data.title} width={280} height={280} />
+        </div>
+      )}
+      <h1 class="t-display title">{project.data.title}</h1>
+      <p class="desc">{project.data.summary}</p>
+      {project.data.tags?.length > 0 && (
+        <ul class="tags">
+          {project.data.tags.map((tag: string) => (
+            <li class="tag">{tag}</li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="body">
+      <Content />
+    </div>
+  </div>
+</article>
+
+<style>
+  .project-article {
+    padding: var(--space-9) 0;
+  }
+  .inner {
+    max-width: 44rem;
+    margin: 0 auto;
+    padding: 0 var(--page-padding-x);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  .back {
+    align-self: flex-start;
+    font-size: 0.875rem;
+    color: var(--color-muted);
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .back:hover { color: var(--color-fg); opacity: 1; }
+
+  .project-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+  }
+  .logo {
+    width: clamp(120px, 28vw, 200px);
+    margin-bottom: var(--space-2);
+  }
+  .logo :global(img) {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+  .title {
+    font-size: clamp(2.25rem, 6vw, 4rem);
+    line-height: var(--lh-h1);
+    letter-spacing: var(--ls-h1);
+    max-width: 22ch;
+  }
+  .desc { color: var(--color-text); font-size: 1.125rem; line-height: 1.55; max-width: 48ch; }
+
+  .tags {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .tag {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding: 4px 10px;
+    border: var(--border-hairline) solid var(--color-border-strong);
+    border-radius: var(--radius-xs);
+  }
+
+  .body {
+    font-family: var(--font-body);
+    font-size: 1.0625rem;
+    line-height: 1.7;
+    color: var(--color-text);
+  }
+  .body :global(h2) {
+    font-family: var(--font-display);
+    font-size: 1.75rem;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    color: var(--color-fg);
+    margin-top: var(--space-7);
+    margin-bottom: var(--space-3);
+  }
+  .body :global(h3) {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.3;
+    color: var(--color-fg);
+    margin-top: var(--space-5);
+    margin-bottom: var(--space-2);
+  }
+  .body :global(p)  { margin: 0 0 var(--space-4); }
+  .body :global(ul),
+  .body :global(ol) {
+    padding-left: 1.5em;
+    margin: 0 0 var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .body :global(li::marker) { color: var(--color-muted); }
+  .body :global(strong) { color: var(--color-fg); font-weight: var(--fw-semi); }
+  .body :global(hr) {
+    border: 0;
+    border-top: var(--border-hairline) solid var(--color-border-subtle);
+    margin: var(--space-7) 0;
+  }
+  .body :global(a) {
+    color: var(--color-fg);
+    border-bottom: 1px solid var(--color-border-strong);
+  }
+  .body :global(a:hover) {
+    border-bottom-color: var(--color-fg);
+    opacity: 1;
+  }
+</style>

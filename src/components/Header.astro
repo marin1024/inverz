@@ -1,0 +1,309 @@
+---
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  altUrl: string;
+}
+
+const { lang, altUrl } = Astro.props;
+const d = t(lang);
+const homeHref = lang === 'hr' ? '/' : '/en/';
+
+const navItems = [
+  { href: `${homeHref}#usluge`,  label: d.nav.services },
+  { href: `${homeHref}#projekti`, label: d.nav.projects },
+  // Privremeno skriveno dok ne dodam objave — vrati kad bude sadržaja.
+  // { href: lang === 'hr' ? '/objave/' : '/en/posts/', label: d.nav.posts },
+  { href: `${homeHref}#kontakt`, label: d.nav.contact },
+];
+---
+
+<header class="site-header">
+  <div class="bar">
+    <a href={homeHref} class="brand" aria-label="INVERZ — početna">INVERZ</a>
+
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-controls="primary-nav"
+      aria-expanded="false"
+      data-toggle="primary-nav"
+    >
+      <span class="sr-only">Menu</span>
+      <span class="bars" aria-hidden="true">
+        <span></span><span></span>
+      </span>
+    </button>
+
+    <nav id="primary-nav" class="nav" aria-label={d.nav.home}>
+      <ul class="nav-list">
+        {navItems.map((item) => (
+          <li><a href={item.href}>{item.label}</a></li>
+        ))}
+      </ul>
+
+      <div class="lang">
+        <span class="lang-current" aria-current="true">{lang === 'hr' ? d.langSwitcher.hr : d.langSwitcher.en}</span>
+        <span class="lang-sep" aria-hidden="true">/</span>
+        <a
+          href={altUrl}
+          class="lang-other"
+          hreflang={lang === 'hr' ? 'en' : 'hr'}
+          aria-label={d.langSwitcher.switchTo}
+          data-lang-switch={lang === 'hr' ? 'en' : 'hr'}
+        >{lang === 'hr' ? d.langSwitcher.en : d.langSwitcher.hr}</a>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+
+  // Skrij (scroll-down) / otkrij (scroll-up) header.
+  function setHidden(hidden: boolean) {
+    header?.classList.toggle('is-hidden', hidden);
+  }
+
+  // Mobile nav toggle
+  const toggle = document.querySelector<HTMLButtonElement>('[data-toggle="primary-nav"]');
+  const nav = document.getElementById('primary-nav');
+  if (toggle && nav) {
+    toggle.addEventListener('click', () => {
+      const open = toggle.getAttribute('aria-expanded') === 'true';
+      toggle.setAttribute('aria-expanded', String(!open));
+      nav.classList.toggle('is-open', !open);
+      document.body.classList.toggle('nav-open', !open);
+      if (!open) setHidden(false); // otvaranjem menija header mora biti vidljiv
+    });
+    // Close after clicking a link
+    nav.querySelectorAll('a').forEach((a) => {
+      a.addEventListener('click', () => {
+        if (window.innerWidth < 720) {
+          toggle.setAttribute('aria-expanded', 'false');
+          nav.classList.remove('is-open');
+          document.body.classList.remove('nav-open');
+        }
+      });
+    });
+  }
+
+  // Skrivanje na scroll-down, otkrivanje na scroll-up.
+  if (header) {
+    let lastY = window.scrollY;
+    let ticking = false;
+    const DELTA = 8;        // ignoriraj sitne pomake
+    const TOP_ZONE = 80;    // pri samom vrhu header je uvijek vidljiv
+
+    // Pri vrhu = proziran (stapanje s pozadinom); ispod TOP_ZONE = neprozirno crn.
+    function setScrolled(y: number) {
+      header?.classList.toggle('is-scrolled', y >= TOP_ZONE);
+    }
+    setScrolled(lastY); // početno stanje (npr. reload na sredini stranice)
+
+    function update() {
+      const y = window.scrollY;
+      setScrolled(y);
+      // Ne skrivaj dok je mobilni meni otvoren ili pri samom vrhu.
+      if (document.body.classList.contains('nav-open') || y < TOP_ZONE) {
+        setHidden(false);
+      } else if (Math.abs(y - lastY) > DELTA) {
+        setHidden(y > lastY); // dolje → skrij, gore → otkrij
+      }
+      lastY = y;
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+      if (!ticking) {
+        requestAnimationFrame(update);
+        ticking = true;
+      }
+    }, { passive: true });
+  }
+
+  // Spremi izbor jezika prije navigacije (perzistencija)
+  document.querySelectorAll<HTMLAnchorElement>('[data-lang-switch]').forEach((link) => {
+    link.addEventListener('click', () => {
+      try {
+        const chosen = link.dataset.langSwitch;
+        if (chosen) localStorage.setItem('inverz_lang', chosen);
+      } catch (_) {}
+    });
+  });
+</script>
+
+<style>
+  .site-header {
+    /* Pri vrhu stranice header je proziran i stapa se s pozadinom — točkice
+       se vide kroz njega. Kad se skrola (.is-scrolled), ::before sloj se
+       utopi u neprozirnu tamnu boju (smoked preko --color-bg), pa je header
+       crn i čitljiv iznad sadržaja. Fiksan zbog skrivanja/otkrivanja na scroll. */
+    background: transparent;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    transition: transform var(--transition-base);
+    will-change: transform;
+  }
+  /* Tamni neprozirni sloj — utapa se tek kad korisnik skrola. */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(var(--color-smoked), var(--color-smoked)), var(--color-bg);
+    opacity: 0;
+    transition: opacity var(--transition-base);
+  }
+  .site-header.is-scrolled::before { opacity: 1; }
+  /* Otvoren mobilni meni → header neprozirno crn (čitljivo), bez obzira na scroll. */
+  .site-header:has(.nav.is-open)::before { opacity: 1; }
+  /* Skriven (klizne prema gore) kad korisnik skrola prema dolje. */
+  .site-header.is-hidden {
+    transform: translateY(-100%);
+  }
+  .bar {
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: var(--space-4) var(--page-padding-x);
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+  .brand {
+    /* INVERZ wordmark — bijeli tekst, bez efekata (glow je samo u herou).
+       Syncopate 700, nativna širina (bez scaleX). */
+    font-family: 'Syncopate', sans-serif;
+    font-size: 1.0625rem;                   /* veličina logotipa u headeru */
+    line-height: 1;
+    font-weight: 700;
+    color: var(--color-fg);
+    letter-spacing: 0.16em;
+    display: inline-block;
+    border-bottom: 0;
+    padding-bottom: 0;
+  }
+  .brand:hover { opacity: 0.85; }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    margin-left: auto;
+  }
+
+  .nav-list {
+    list-style: none;
+    display: flex;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+  }
+  .nav-list a {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-text);
+    border-bottom: 0;
+    padding-bottom: 0;
+    font-weight: var(--fw-medium);
+  }
+  .nav-list a:hover { color: var(--color-fg); opacity: 1; }
+
+  .lang {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .lang-current { color: var(--color-muted); }
+  .lang-sep    { color: var(--color-border-strong); }
+  .lang-other  { color: var(--color-fg); border-bottom: 1px solid var(--color-fg); padding-bottom: 1px; }
+
+  .menu-toggle {
+    display: none;
+    margin-left: auto;
+    width: 36px;
+    height: 36px;
+    align-items: center;
+    justify-content: center;
+  }
+  .menu-toggle .bars {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 22px;
+  }
+  .menu-toggle .bars span {
+    display: block;
+    height: 1.5px;
+    background: var(--color-fg);
+    transition: transform var(--transition-base);
+  }
+  .menu-toggle[aria-expanded="true"] .bars span:nth-child(1) {
+    transform: translateY(4px) rotate(45deg);
+  }
+  .menu-toggle[aria-expanded="true"] .bars span:nth-child(2) {
+    transform: translateY(-4px) rotate(-45deg);
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+  }
+
+  /* ---- Mobile ---------------------------------------- */
+  @media (max-width: 719px) {
+    .menu-toggle { display: inline-flex; }
+    .nav {
+      position: fixed;
+      /* .site-header ima will-change: transform → on je containing block za
+         fixed potomke, pa bi bottom:0 kolabirao visinu panela na ~0 (pozadina
+         se ne vidi). Zato eksplicitna visina umjesto inset bottom. */
+      top: var(--header-h);
+      left: 0;
+      right: 0;
+      height: calc(100vh - var(--header-h));
+      height: calc(100dvh - var(--header-h));
+      background: linear-gradient(var(--color-smoked), var(--color-smoked)), var(--color-bg);
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: stretch;
+      padding: var(--space-7) var(--page-padding-x);
+      gap: var(--space-6);
+      transform: translateY(-100%);
+      transition: transform var(--transition-base);
+      visibility: hidden;
+      border-top: var(--border-hairline) solid var(--color-border-subtle);
+    }
+    .nav.is-open {
+      transform: translateY(0);
+      visibility: visible;
+    }
+    .nav-list {
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .nav-list a {
+      font-size: 1.25rem;
+      font-family: var(--font-display);
+    }
+    .lang {
+      font-size: 1rem;
+    }
+  }
+
+  :global(body.nav-open) {
+    overflow: hidden;
+  }
+</style>

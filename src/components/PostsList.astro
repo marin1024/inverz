@@ -1,0 +1,212 @@
+---
+import { getCollection } from 'astro:content';
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const d = t(lang);
+
+const collectionName = lang === 'hr' ? 'postsHr' : 'postsEn';
+const all = await getCollection(collectionName, ({ data }) => !data.draft);
+
+// Pripremimo postove sortirane od najnovijeg.
+const posts = all.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+const categories = Array.from(new Set(posts.map((p) => p.data.category))).sort();
+
+const postsBase = lang === 'hr' ? '/objave' : '/en/posts';
+const dateLocale = lang === 'hr' ? 'hr-HR' : 'en-GB';
+
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat(dateLocale, {
+    year: 'numeric', month: 'long', day: 'numeric',
+  }).format(date);
+}
+---
+
+<section class="posts-page">
+  <div class="inner">
+    <header class="page-head">
+      <h1 class="t-display title">{d.postsPage.title}</h1>
+      <p class="sub">{d.postsPage.sub}</p>
+    </header>
+
+    <div class="controls" data-controls>
+      <label class="control">
+        <span class="t-eyebrow">{d.postsPage.filterLabel}</span>
+        <select data-filter="category">
+          <option value="">{d.postsPage.all}</option>
+          {categories.map((cat) => (
+            <option value={cat}>{cat}</option>
+          ))}
+        </select>
+      </label>
+
+      <label class="control">
+        <span class="t-eyebrow">{d.postsPage.sortLabel}</span>
+        <select data-filter="sort">
+          <option value="newest">{d.postsPage.sortNewest}</option>
+          <option value="oldest">{d.postsPage.sortOldest}</option>
+        </select>
+      </label>
+    </div>
+
+    <ul class="list" data-list>
+      {posts.map((post) => (
+        <li
+          class="item"
+          data-category={post.data.category}
+          data-date={post.data.pubDate.toISOString()}
+        >
+          <a href={`${postsBase}/${post.id}/`} class="item-link">
+            <span class="item-meta">
+              <span class="item-cat">{post.data.category}</span>
+              <span class="dot" aria-hidden="true">·</span>
+              <time datetime={post.data.pubDate.toISOString()}>{formatDate(post.data.pubDate)}</time>
+            </span>
+            <h2 class="t-h2 item-title">{post.data.title}</h2>
+            <p class="item-desc">{post.data.description}</p>
+            <span class="item-arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p class="empty t-body" data-empty hidden>{d.postsPage.empty}</p>
+  </div>
+</section>
+
+<script>
+  const list = document.querySelector<HTMLElement>('[data-list]');
+  const empty = document.querySelector<HTMLElement>('[data-empty]');
+  const categorySel = document.querySelector<HTMLSelectElement>('[data-filter="category"]');
+  const sortSel     = document.querySelector<HTMLSelectElement>('[data-filter="sort"]');
+
+  function apply() {
+    if (!list) return;
+    const cat = categorySel?.value ?? '';
+    const sort = sortSel?.value ?? 'newest';
+
+    const items = Array.from(list.querySelectorAll<HTMLElement>('.item'));
+
+    // Sort
+    items.sort((a, b) => {
+      const da = new Date(a.dataset.date ?? '').getTime();
+      const db = new Date(b.dataset.date ?? '').getTime();
+      return sort === 'newest' ? db - da : da - db;
+    });
+    items.forEach((el) => list.appendChild(el));
+
+    // Filter
+    let visible = 0;
+    items.forEach((el) => {
+      const show = !cat || el.dataset.category === cat;
+      el.hidden = !show;
+      if (show) visible++;
+    });
+
+    if (empty) empty.hidden = visible > 0;
+  }
+
+  categorySel?.addEventListener('change', apply);
+  sortSel?.addEventListener('change', apply);
+</script>
+
+<style>
+  .posts-page {
+    padding: var(--space-9) 0;
+  }
+  .inner {
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--page-padding-x);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  .page-head {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding-bottom: var(--space-5);
+  }
+  .title {
+    font-size: clamp(2.75rem, 8vw, 5rem);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+  }
+  .sub { color: var(--color-text); font-size: 1.0625rem; max-width: 50ch; }
+
+  .controls {
+    display: flex;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+  }
+  .control { display: flex; flex-direction: column; gap: var(--space-2); }
+  .control select {
+    font: inherit;
+    font-family: var(--font-body);
+    color: var(--color-fg);
+    background: var(--color-smoked);  /* smoked sloj, kao kod ostalih dugmadi/kutija */
+    border: var(--border-hairline) solid var(--color-border-strong);
+    border-radius: var(--radius-xs);
+    padding: 10px 14px;
+    min-width: 200px;
+  }
+  .control select:focus {
+    outline: none;
+    border-color: var(--color-fg);
+  }
+
+  .list {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-5);
+  }
+  .item { margin: 0; }
+  .item-link {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    border: var(--border-hairline) solid rgba(255, 255, 255, 0.10);
+    background: var(--color-smoked);
+    border-bottom-width: 1px;
+    color: var(--color-fg);
+    text-decoration: none;
+    height: 100%;
+    min-height: 240px;
+    transition: border-color var(--transition-base);
+  }
+  .item-link:hover {
+    opacity: 1;
+    border-color: var(--color-border-strong);
+  }
+  .item-link:hover .item-arrow { transform: translateX(4px); }
+  .item-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .item-cat { color: var(--color-text); }
+  .dot { color: var(--color-border-strong); }
+  .item-title { max-width: 28ch; }
+  .item-desc { color: var(--color-text); font-size: 0.9375rem; line-height: 1.55; }
+  .item-arrow {
+    align-self: flex-end;
+    margin-top: auto;
+    font-size: 1.25rem;
+    transition: transform var(--transition-base);
+  }
+
+  .empty { color: var(--color-muted); }
+</style>

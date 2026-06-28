@@ -1,0 +1,89 @@
+---
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const d = t(lang);
+const homeHref = lang === 'hr' ? '/' : '/en/';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="inner">
+    <h1 id="hero-title" class="t-display title">{d.hero.title}</h1>
+    <p class="sub">{d.hero.sub}</p>
+    <a href={`${homeHref}#kontakt`} class="cta">
+      <span>{d.hero.cta}</span>
+      <span class="arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+</section>
+
+<style>
+  .hero {
+    /* Ispuni ekran po visini pri prvom otvaranju, sadržaj vertikalno centriran.
+       svh = mali viewport (uračunava mobilne alatne trake). */
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Gornji padding čisti fiksni (transparentni) header. */
+    padding: calc(var(--header-h) + var(--space-7)) 0 var(--space-9);
+  }
+  .inner {
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--page-padding-x);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+  .title {
+    font-size: clamp(2.75rem, 8vw, var(--fs-display));
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+    max-width: 18ch;
+    color: var(--color-fg);
+  }
+  .sub {
+    font-size: 1.125rem;
+    line-height: 1.55;
+    color: var(--color-text);
+    max-width: 48ch;
+  }
+  .cta {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 16px 28px;
+    margin-top: var(--space-2);
+    border: var(--border-hairline) solid var(--color-fg);
+    background: var(--color-smoked);
+    color: var(--color-fg);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-xs);
+    border-bottom: var(--border-hairline) solid var(--color-fg);
+    padding-bottom: 16px;
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+  .cta:hover {
+    background: var(--color-fg);
+    color: var(--color-bg);
+    opacity: 1;
+  }
+  .cta .arrow {
+    display: inline-block;
+    transition: transform var(--transition-base);
+  }
+  .cta:hover .arrow { transform: translateX(4px); }
+
+  @media (max-width: 720px) {
+    .hero { padding: calc(var(--header-h) + var(--space-6)) 0 var(--space-7); }
+    .sub { font-size: 1rem; }
+  }
+</style>

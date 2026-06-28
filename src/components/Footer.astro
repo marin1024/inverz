@@ -1,0 +1,151 @@
+---
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+import { siteConfig, whatsappUrl } from '../config/site';
+
+interface Props {
+  lang: Lang;
+  altUrl: string;
+}
+
+const { lang, altUrl } = Astro.props;
+const d = t(lang);
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="inner">
+
+    <div class="grid">
+      <div class="cell brand-cell">
+        <span class="brand inverz-wordmark" aria-label="INVERZ">INVERZ</span>
+        <p class="t-small tagline">{d.footer.tagline}</p>
+      </div>
+
+      <div class="cell">
+        <p class="t-eyebrow heading">{d.footer.company}</p>
+        <ul class="list">
+          <li><span class="t-small">{siteConfig.company.legalName}</span></li>
+          <li><span class="t-small">{d.footer.oibLabel}: {siteConfig.company.oib}</span></li>
+          <li><span class="t-small">{siteConfig.company.address}</span></li>
+        </ul>
+      </div>
+
+      <div class="cell">
+        <p class="t-eyebrow heading">{d.footer.contact}</p>
+        <ul class="list">
+          <li><a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a></li>
+          <li><a href={`tel:${siteConfig.contact.phoneRaw}`}>{siteConfig.contact.phone}</a></li>
+          <li><a href={whatsappUrl()} target="_blank" rel="noopener">WhatsApp</a></li>
+        </ul>
+      </div>
+
+      <div class="cell">
+        <p class="t-eyebrow heading">{d.langSwitcher.label}</p>
+        <div class="lang-row">
+          <span class="lang-current">{lang === 'hr' ? d.langSwitcher.hr : d.langSwitcher.en}</span>
+          <span class="lang-sep" aria-hidden="true">/</span>
+          <a
+            href={altUrl}
+            class="lang-other"
+            hreflang={lang === 'hr' ? 'en' : 'hr'}
+            aria-label={d.langSwitcher.switchTo}
+            data-lang-switch={lang === 'hr' ? 'en' : 'hr'}
+          >{lang === 'hr' ? d.langSwitcher.en : d.langSwitcher.hr}</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="legal">
+      <p class="t-small">© {year} {siteConfig.company.legalName}. {d.footer.rights}</p>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Spremi izbor jezika (footer prebacivač)
+  document.querySelectorAll<HTMLAnchorElement>('footer [data-lang-switch]').forEach((link) => {
+    link.addEventListener('click', () => {
+      try {
+        const chosen = link.dataset.langSwitch;
+        if (chosen) localStorage.setItem('inverz_lang', chosen);
+      } catch (_) {}
+    });
+  });
+</script>
+
+<style>
+  .site-footer {
+    margin-top: var(--space-10);
+    background: transparent;
+  }
+  .inner {
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: var(--space-8) var(--page-padding-x) var(--space-6);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr 1fr 0.8fr;
+    gap: var(--space-6);
+  }
+  .cell { display: flex; flex-direction: column; gap: var(--space-3); }
+  /* INVERZ wordmark — tamni lockup (.inverz-wordmark u global.css);
+     ovdje samo veličina (malo veća od starog logotipa). */
+  .brand {
+    font-size: 1.9rem;   /* veličina wordmarka u footeru */
+    margin: 0;
+  }
+  .tagline { color: var(--color-muted); max-width: 22ch; }
+
+  .heading {
+    color: var(--color-muted);
+  }
+  .list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+  .list a {
+    border-bottom: 0;
+    padding-bottom: 0;
+    font-size: 0.875rem;
+    color: var(--color-text);
+  }
+  .list a:hover { color: var(--color-fg); opacity: 1; }
+  .list .t-small { color: var(--color-text); }
+
+  .lang-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-body);
+    font-size: 0.875rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  .lang-current { color: var(--color-muted); }
+  .lang-sep    { color: var(--color-border-strong); }
+  .lang-other  { color: var(--color-fg); }
+
+  .legal {
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    color: var(--color-muted);
+  }
+  .legal .t-small { color: var(--color-muted); }
+
+  @media (max-width: 720px) {
+    .grid {
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+    }
+    .brand-cell { grid-column: 1 / -1; }
+  }
+  @media (max-width: 420px) {
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>

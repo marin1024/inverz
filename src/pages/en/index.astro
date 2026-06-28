@@ -1,0 +1,25 @@
+---
+import PageLayout from '../../layouts/PageLayout.astro';
+import Hero from '../../components/Hero.astro';
+import ServicesSection from '../../components/ServicesSection.astro';
+import HowIWork from '../../components/HowIWork.astro';
+import ProjectsSection from '../../components/ProjectsSection.astro';
+// Temporarily hidden until I add posts — restore this import when there's content.
+// import PostsPreview from '../../components/PostsPreview.astro';
+import ContactSection from '../../components/ContactSection.astro';
+import { altLangUrl } from '../../i18n';
+
+const lang = 'en';
+const altUrl = altLangUrl(lang, '/en/');
+---
+
+<PageLayout lang={lang} altUrl={altUrl} canonical="https://inverz.hr/en/">
+  <Hero lang={lang} />
+  <ServicesSection lang={lang} />
+  <HowIWork lang={lang} />
+  <ProjectsSection lang={lang} />
+  {/* "04 · Notes" section hidden until there's content. Restore this line (and
+      revert the i18n numbering: contact → 05, posts → 04) when posts exist. */}
+  {/* <PostsPreview lang={lang} /> */}
+  <ContactSection lang={lang} />
+</PageLayout>

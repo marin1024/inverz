@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import ProjectArticle from '../../components/ProjectArticle.astro';
+import { altLangUrl } from '../../i18n';
+
+export async function getStaticPaths() {
+  const projects = await getCollection('projectsHr', ({ data }) => !data.draft);
+  return projects.map((project) => ({
+    params: { slug: project.id },
+    props:  { project },
+  }));
+}
+
+const { project } = Astro.props;
+const lang = 'hr';
+const altUrl = altLangUrl(lang, Astro.url.pathname, { pairSlug: project.data.pairSlug });
+---
+
+<PageLayout
+  lang={lang}
+  altUrl={altUrl}
+  title={`${project.data.title} — INVERZ`}
+  description={project.data.summary}
+  canonical={`https://inverz.hr/projekti/${project.id}/`}
+>
+  <ProjectArticle lang={lang} project={project} />
+</PageLayout>

@@ -1,0 +1,339 @@
+---
+// /style — preview vizualnog jezika za fazu 1.
+// Ovdje NIJE pravi sadržaj sajta, već uzorci tipografije i komponenti.
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout lang="hr" altUrl="/en/" title="INVERZ — Style preview">
+  <main class="page">
+
+    {/* ─────────────────────────────────────────────
+        META LINIJA
+    ───────────────────────────────────────────── */}
+    <header class="meta">
+      <span class="t-eyebrow">INVERZ</span>
+      <span class="meta-dot" aria-hidden="true"></span>
+      <span class="t-eyebrow">Style preview · v0.1</span>
+    </header>
+
+    {/* ─────────────────────────────────────────────
+        WORDMARK
+    ───────────────────────────────────────────── */}
+    <section class="block">
+      <h1 class="t-display wordmark">INVERZ</h1>
+      <p class="t-small">Space Grotesk · 88 / 0.95 / −0.035em</p>
+    </section>
+
+    <hr class="rule" />
+
+    {/* ─────────────────────────────────────────────
+        TIPOGRAFIJA
+    ───────────────────────────────────────────── */}
+    <section class="block">
+      <p class="t-eyebrow">01 · Tipografija</p>
+
+      <div class="stack">
+        <div class="row">
+          <h2 class="t-h1">Naslov razine 1</h2>
+          <span class="t-small note">h1 · 56 / 1.05 / −0.025em</span>
+        </div>
+
+        <div class="row">
+          <h3 class="t-h2">Naslov razine 2</h3>
+          <span class="t-small note">h2 · 36 / 1.15 / −0.02em</span>
+        </div>
+
+        <div class="row">
+          <h4 class="t-h3">Naslov razine 3</h4>
+          <span class="t-small note">h3 · 24 / 1.25 / −0.015em</span>
+        </div>
+
+        <div class="row">
+          <p class="t-eyebrow">Eyebrow / oznaka sekcije</p>
+          <span class="t-small note">Inter uppercase · 13 / 1.4 / 0.14em</span>
+        </div>
+
+        <div class="row prose">
+          <p class="t-body">
+            Tijelo teksta nosi <strong>Inter</strong> u 16px s velikodušnim
+            line-heightom kako bi duži paragrafi ostali ugodni za čitanje.
+            Boja teksta je <code>#E8E8E8</code> umjesto čistog bijelog —
+            to smanjuje titranje na crnoj pozadini bez gubitka kontrasta.
+          </p>
+          <span class="t-small note">body · 16 / 1.65 / 0</span>
+        </div>
+
+        <div class="row">
+          <p class="t-small">Sitni tekst i napomene (caption).</p>
+          <span class="t-small note">small · 13 / 1.5 · muted</span>
+        </div>
+      </div>
+    </section>
+
+    <hr class="rule" />
+
+    {/* ─────────────────────────────────────────────
+        INTERAKCIJE
+    ───────────────────────────────────────────── */}
+    <section class="block">
+      <p class="t-eyebrow">02 · Interakcije</p>
+
+      <div class="cluster">
+        <div class="state">
+          <button class="btn" type="button">Saznaj više</button>
+          <span class="t-small note">default</span>
+        </div>
+        <div class="state">
+          <button class="btn is-hover" type="button" aria-label="Saznaj više (hover stanje, samo za preview)">Saznaj više</button>
+          <span class="t-small note">hover (statički prikaz)</span>
+        </div>
+      </div>
+
+      <p class="t-body prose">
+        Linkovi u tijelu teksta izgledaju ovako — to je
+        <a href="#">tekstualni link s tankim podvlakom</a> koji na hover
+        gubi nešto neprozirnosti. Nema obojenih akcenata; sve ostaje
+        unutar monokromatske palete.
+      </p>
+    </section>
+
+    <hr class="rule" />
+
+    {/* ─────────────────────────────────────────────
+        KARTICA
+    ───────────────────────────────────────────── */}
+    <section class="block">
+      <p class="t-eyebrow">03 · Kartica (zamišljena kartica usluge)</p>
+
+      <div class="cards">
+        <article class="card">
+          <span class="card-num t-eyebrow">01</span>
+          <h3 class="t-h3 card-title">Naslov usluge</h3>
+          <p class="t-body card-body">
+            Kratki opis usluge u nekoliko rečenica. Tekst je sažet, jasno
+            postavlja koristi i ne razvlači se.
+          </p>
+          <a href="#" class="card-link">Detalji <span aria-hidden="true">→</span></a>
+        </article>
+
+        <article class="card is-hover" aria-label="Kartica u hover stanju (samo za preview)">
+          <span class="card-num t-eyebrow">02</span>
+          <h3 class="t-h3 card-title">Naslov usluge</h3>
+          <p class="t-body card-body">
+            Kratki opis usluge u nekoliko rečenica. Tekst je sažet, jasno
+            postavlja koristi i ne razvlači se.
+          </p>
+          <a href="#" class="card-link">Detalji <span aria-hidden="true">→</span></a>
+        </article>
+      </div>
+
+      <p class="t-small caption">Lijevo: default · Desno: hover (statički prikaz)</p>
+    </section>
+
+    <hr class="rule" />
+
+    {/* ─────────────────────────────────────────────
+        PALETA
+    ───────────────────────────────────────────── */}
+    <section class="block">
+      <p class="t-eyebrow">04 · Paleta</p>
+      <div class="swatches">
+        <div class="swatch">
+          <div class="swatch-chip" style="background:#000000; border:1px solid var(--color-border-strong);"></div>
+          <span class="t-small">Background · #000000</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-chip" style="background:#FFFFFF;"></div>
+          <span class="t-small">Foreground · #FFFFFF</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-chip" style="background:#E8E8E8;"></div>
+          <span class="t-small">Text · #E8E8E8</span>
+        </div>
+        <div class="swatch">
+          <div class="swatch-chip" style="background:#8A8A8A;"></div>
+          <span class="t-small">Muted · #8A8A8A</span>
+        </div>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <span class="t-small">Faza 1 · temelji stila</span>
+    </footer>
+  </main>
+
+  {/* ─────────────────────────────────────────────
+      STILOVI SAMO ZA OVU STRANICU
+  ───────────────────────────────────────────── */}
+  <style>
+    .page {
+      max-width: var(--max-content);
+      margin: 0 auto;
+      padding: var(--space-8) var(--page-padding-x) var(--space-10);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+
+    /* ---- Meta linija ------------------------------------- */
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+    .meta-dot {
+      width: 4px;
+      height: 4px;
+      background: var(--color-muted);
+      border-radius: 50%;
+    }
+
+    /* ---- Bloki ------------------------------------------- */
+    .block {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .rule {
+      border: 0;
+      border-top: var(--border-hairline) solid var(--color-border-subtle);
+      margin: 0;
+    }
+
+    /* ---- Wordmark ---------------------------------------- */
+    .wordmark {
+      /* drži se na display skali iz tokena */
+      font-size: clamp(3.5rem, 12vw, var(--fs-display));
+    }
+
+    /* ---- Stack rows za tipografiju ----------------------- */
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: baseline;
+      gap: var(--space-5);
+    }
+    .row.prose p { max-width: var(--max-prose); }
+    .note { color: var(--color-muted); white-space: nowrap; }
+
+    .prose { max-width: var(--max-prose); }
+    .prose code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.9em;
+      color: var(--color-fg);
+      background: #0F0F0F;
+      padding: 2px 6px;
+      border-radius: var(--radius-xs);
+    }
+    .prose strong { color: var(--color-fg); font-weight: var(--fw-semi); }
+
+    /* ---- Interakcije ------------------------------------- */
+    .cluster {
+      display: flex;
+      gap: var(--space-6);
+      flex-wrap: wrap;
+    }
+    .state {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      align-items: flex-start;
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-size: var(--fs-body);
+      font-weight: var(--fw-medium);
+      line-height: 1;
+      letter-spacing: 0.01em;
+      color: var(--color-fg);
+      background: transparent;
+      border: var(--border-hairline) solid var(--color-fg);
+      padding: 14px 28px;
+      border-radius: var(--radius-xs);
+      transition: background var(--transition-fast), color var(--transition-fast);
+    }
+    .btn:hover,
+    .btn.is-hover {
+      background: var(--color-fg);
+      color: var(--color-bg);
+    }
+
+    /* ---- Kartice ----------------------------------------- */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-5);
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-4);
+      padding: var(--space-6);
+      border: var(--border-hairline) solid var(--color-border-subtle);
+      border-radius: var(--radius-none);
+      transition: border-color var(--transition-base);
+      min-height: 220px;
+    }
+    .card:hover,
+    .card.is-hover {
+      border-color: var(--color-border-strong);
+    }
+    .card-num { color: var(--color-muted); }
+    .card-title { margin-top: var(--space-1); }
+    .card-body { color: var(--color-text); flex: 1; }
+    .card-link {
+      align-self: flex-start;
+      border-bottom: none;
+      color: var(--color-fg);
+      font-weight: var(--fw-medium);
+      display: inline-flex;
+      gap: 0.4em;
+      padding-bottom: 0;
+    }
+    .card-link span {
+      transition: transform var(--transition-base);
+      display: inline-block;
+    }
+    .card:hover .card-link span,
+    .card.is-hover .card-link span {
+      transform: translateX(3px);
+    }
+
+    .caption { color: var(--color-muted); }
+
+    /* ---- Paleta ------------------------------------------ */
+    .swatches {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-4);
+    }
+    .swatch { display: flex; flex-direction: column; gap: var(--space-2); }
+    .swatch-chip {
+      width: 100%;
+      aspect-ratio: 3 / 1;
+      border-radius: var(--radius-xs);
+    }
+
+    /* ---- Footer ------------------------------------------ */
+    .footer {
+      padding-top: var(--space-5);
+      border-top: var(--border-hairline) solid var(--color-border-subtle);
+      color: var(--color-muted);
+    }
+
+    /* ---- Manji ekrani: kolaps note kolone --------------- */
+    @media (max-width: 640px) {
+      .row {
+        grid-template-columns: 1fr;
+        gap: var(--space-1);
+      }
+      .note { white-space: normal; }
+    }
+  </style>
+</BaseLayout>

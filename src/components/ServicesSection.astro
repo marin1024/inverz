@@ -1,0 +1,246 @@
+---
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+import ServicePicker from './ServicePicker.tsx';
+import type { ServiceId } from './ServicePicker.tsx';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const d = t(lang);
+const homeHref = lang === 'hr' ? '/' : '/en/';
+
+const ids: ServiceId[] = ['audit', 'web', 'ads', 'systems'];
+const items = ids.map((id) => ({
+  id,
+  title: d.services.items[id].title,
+  desc:  d.services.items[id].desc,
+}));
+---
+
+<!-- Za isprobavanje izgleda kartica promijeni samo varijantu ispod:
+     glass-smoked | glass-lifted | glass-edge | glass-rays -->
+<section class="services glass-rays" id="usluge" aria-labelledby="services-title">
+  <div class="inner">
+    <header class="sec-head">
+      <p class="t-eyebrow">{d.services.eyebrow}</p>
+      <h2 id="services-title" class="t-h1 title">{d.services.title}</h2>
+      <p class="sub">{d.services.sub}</p>
+      <p class="t-small hint">{d.services.clickToToggleHint}</p>
+    </header>
+
+    <ServicePicker
+      client:load
+      items={items}
+      selectedAriaLabel={d.services.selectedAria}
+    />
+
+    <div class="cta-row">
+      <a href={`${homeHref}#kontakt`} class="cta">
+        <span>{d.services.cta}</span>
+        <span class="arrow" aria-hidden="true">↓</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style is:global>
+  /* Stilovi za React komponentu — moraju biti is:global jer Astro
+     ne scope-a klase iz React djece. */
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+  }
+
+  .service-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    min-height: 220px;
+    border: var(--border-hairline) solid var(--color-border-subtle);
+    border-radius: var(--radius-none);
+    color: var(--color-fg);
+    text-align: left;
+    cursor: pointer;
+    font: inherit;
+    transition:
+      border-color  220ms ease,
+      background    220ms ease,
+      color         220ms ease,
+      transform     180ms ease;
+  }
+
+  .service-card .service-icon {
+    color: #6E6E6E;
+    transition: color 220ms ease, transform 220ms ease;
+    line-height: 0;
+  }
+  .service-card .service-title {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    line-height: 1.25;
+    font-weight: var(--fw-medium);
+    color: var(--color-fg);
+    letter-spacing: -0.015em;
+    margin-top: var(--space-1);
+  }
+  .service-card .service-desc {
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--color-muted);
+    transition: color 220ms ease;
+  }
+
+  /* ============================================================
+     GLASS VARIJANTE — testiranje izgleda kartica (sekcija 01 USLUGE).
+     Aktiviraj promjenom klase na <section class="services …"> iznad:
+       glass-smoked | glass-lifted | glass-edge | glass-rays
+     Prozirne (bez blura); razlikuju se po pozadini/rubu.
+     Kasnije se iste klase mogu primijeniti i na druge kartice.
+     ============================================================ */
+
+  /* 1) Smoked glass — zadimljeno staklo */
+  .glass-smoked .service-card {
+    background: var(--color-smoked);
+    border-color: rgba(255, 255, 255, 0.10);
+  }
+
+  /* 2) Lifted glass — svijetli sloj */
+  .glass-lifted .service-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+
+  /* 3) Edge lit pane — naglašen gornji rub */
+  .glass-edge .service-card {
+    background: rgba(255, 255, 255, 0.02);
+    border-color: rgba(255, 255, 255, 0.10);
+    border-top-color: rgba(255, 255, 255, 0.20);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* 4) Reflection (rays) — odsjaji preko zadimljenog stakla, s rubom (3) */
+  .glass-rays .service-card {
+    background:
+      linear-gradient(150deg,
+        rgba(255, 255, 255, 0.045) 0%,
+        rgba(255, 255, 255, 0.015) 30%,
+        rgba(255, 255, 255, 0.00) 45%,
+        rgba(255, 255, 255, 0.0375) 62%,
+        rgba(255, 255, 255, 0.00) 80%),
+      var(--color-smoked);
+    border-color: rgba(255, 255, 255, 0.10);
+    border-top-color: rgba(255, 255, 255, 0.20);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  }
+
+  /* ---- HOVER — vidno se pali (radi sa svim varijantama) ---- */
+  .service-card:hover {
+    border-color: rgba(255, 255, 255, 0.32);
+    transform: translateY(-1px);
+  }
+  .service-card:hover .service-icon { color: var(--color-fg); }
+  .service-card:hover .service-desc  { color: var(--color-text); }
+
+  .service-card:focus-visible {
+    outline: none;
+    border-color: var(--color-fg);
+    box-shadow: var(--focus-ring);
+  }
+
+  /* ---- ODABRANO ---------------------------------------- */
+  .service-card.is-selected {
+    border-color: var(--color-fg);
+  }
+  .service-card.is-selected .service-icon { color: var(--color-fg); }
+  .service-card.is-selected .service-desc  { color: var(--color-text); }
+
+  /* ---- Kvačica u kutu --------------------------------- */
+  .service-check {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    width: 24px;
+    height: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--border-hairline) solid var(--color-fg);
+    background: var(--color-fg);
+    color: var(--color-bg);
+    border-radius: var(--radius-xs);
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity 180ms ease, transform 180ms ease;
+    pointer-events: none;
+  }
+  .service-card.is-selected .service-check {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-card, .service-card *, .service-check {
+      transition: none !important;
+    }
+    .service-card:hover { transform: none; }
+  }
+</style>
+
+<style>
+  .services {
+    padding: var(--space-9) 0;
+  }
+  .inner {
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--page-padding-x);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  .sec-head { display: flex; flex-direction: column; gap: var(--space-3); }
+  .title { max-width: 18ch; }
+  .sub { color: var(--color-text); max-width: 56ch; font-size: 1.0625rem; }
+  .hint { color: var(--color-muted); }
+
+  .cta-row {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: var(--space-2);
+  }
+  .cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    padding: 14px 28px;
+    border: var(--border-hairline) solid var(--color-fg);
+    background: var(--color-smoked);
+    color: var(--color-fg);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    font-weight: var(--fw-medium);
+    letter-spacing: 0.01em;
+    border-radius: var(--radius-xs);
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+  .cta:hover {
+    background: var(--color-fg);
+    color: var(--color-bg);
+    opacity: 1;
+  }
+  .cta .arrow {
+    display: inline-block;
+    transition: transform var(--transition-base);
+  }
+  .cta:hover .arrow { transform: translateY(3px); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cta, .cta .arrow { transition: none !important; }
+    .cta:hover .arrow { transform: none; }
+  }
+</style>

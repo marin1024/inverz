@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 460" width="980" height="460">
+<defs>
+<filter id="fl-Ap" x="-70%" y="-70%" width="240%" height="240%"><feGaussianBlur in="SourceGraphic" stdDeviation="28"></feGaussianBlur></filter>
+<filter id="fl-A" x="-60%" y="-60%" width="220%" height="220%"><feMorphology in="SourceGraphic" operator="dilate" radius="0.00"></feMorphology><feGaussianBlur stdDeviation="5.50"></feGaussianBlur></filter>
+</defs>
+<!-- Crna pozadina UKLONJENA → okolina i daleki glow su prozirni (vidi se stranica). -->
+<!-- Tamni glow-panel iza slova: najtamniji → najprozirniji (opacity 0.32). Blur feathera rubove u potpunu prozirnost. -->
+<rect x="149.5" y="195.7" width="681.0" height="58.6" rx="10" fill="#202632" filter="url(#fl-Ap)" opacity="0.32"></rect>
+<!-- Svijetli glow oko slova: najsvjetliji → najmanje proziran (opacity 0.85). Blur feathera u prozirnost prema rubu. -->
+<text x="490" y="230" text-anchor="middle" dominant-baseline="central" font-family="Syncopate, sans-serif" font-weight="700" transform="translate(490 0) scale(1.220 1) translate(-490 0)" font-size="100" letter-spacing="16.00" fill="#c9d4e2" stroke="#c9d4e2" stroke-width="0.00" stroke-linejoin="miter" stroke-miterlimit="12" paint-order="stroke" filter="url(#fl-A)" opacity="0.85">INVERZ</text>
+<!-- Crna slova: PUNA neprozirnost (opacity 1), silueta protiv svijetlog glowa. -->
+<text x="490" y="230" text-anchor="middle" dominant-baseline="central" font-family="Syncopate, sans-serif" font-weight="700" transform="translate(490 0) scale(1.220 1) translate(-490 0)" font-size="100" letter-spacing="16.00" fill="#000000" stroke="#000000" stroke-width="0.00" stroke-linejoin="miter" stroke-miterlimit="12" paint-order="stroke">INVERZ</text>
+</svg>

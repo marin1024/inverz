@@ -1,0 +1,92 @@
+---
+// DotsBackground.astro — drop once into your layout.
+// One fixed canvas behind all page content (z-index: -1).
+---
+<canvas id="dots-bg"></canvas>
+
+<style>
+  #dots-bg {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;            /* sits behind page content */
+    pointer-events: none;   /* clicks pass straight through */
+  }
+</style>
+
+<script>
+  import { createNoise3D } from 'simplex-noise'
+
+  const canvas = document.getElementById('dots-bg') as HTMLCanvasElement
+  const ctx = canvas.getContext('2d')!
+  const noise3D = createNoise3D()
+
+  const SPACING = 10
+  const LENGTH  = 5
+  const SCALE   = 600
+  const MARGIN  = LENGTH * 2          // the edge fix
+  const CONTRAST  = 2    // >1 = more dark areas; raise for even darker (try 2–4)
+  const MAX_ALPHA = 0.14   // peak brightness of the lightest dots; lower = less white
+
+  // Boja točkica čita se iz tokena (jedno mjesto za izmjenu).
+  const rootStyle = getComputedStyle(document.documentElement)
+  const readVar = (name: string, fallback: string) =>
+    rootStyle.getPropertyValue(name).trim() || fallback
+  const DOT = hexToRgb(readVar('--color-dots', '#cdcdcd'))
+
+  function hexToRgb(hex: string) {
+    let h = hex.replace('#', '')
+    if (h.length === 3) h = h.split('').map((c) => c + c).join('')
+    const n = parseInt(h, 16)
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 }
+  }
+
+  let points: { x: number; y: number }[] = []
+  let width = 0, height = 0
+
+  function resize() {
+    const dpr = window.devicePixelRatio || 1
+    width  = window.innerWidth
+    height = window.innerHeight
+    canvas.width  = width  * dpr       // bitmap at device resolution
+    canvas.height = height * dpr
+    canvas.style.width  = width  + 'px' // CSS size stays in CSS pixels
+    canvas.style.height = height + 'px'
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0) // draw in CSS px, render crisp
+
+    points = []
+    for (let x = -MARGIN; x <= width  + MARGIN; x += SPACING)
+      for (let y = -MARGIN; y <= height + MARGIN; y += SPACING)
+        points.push({ x, y })
+  }
+
+  function draw(t: number) {
+    ctx.clearRect(0, 0, width, height)
+    for (const p of points) {
+      const a   = noise3D(p.x / SCALE, p.y / SCALE, t) * Math.PI * 2
+      const len = (noise3D(p.x / SCALE + 1000, p.y / SCALE, t * 2) + 1) * 2 * LENGTH
+      const t01   = len / (LENGTH * 4)          // normalize to 0 … 1
+      const alpha = Math.pow(t01, CONTRAST) * MAX_ALPHA
+      ctx.fillStyle = `rgba(${DOT.r}, ${DOT.g}, ${DOT.b}, ${alpha})`
+      ctx.beginPath()
+      ctx.arc(p.x + Math.cos(a) * len, p.y + Math.sin(a) * len, 1, 0, Math.PI * 2)
+      ctx.fill()
+    }
+    ctx.globalAlpha = 1
+  }
+
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  resize()
+  if (reduce) {
+    draw(0)
+    window.addEventListener('resize', () => { resize(); draw(0) })
+  } else {
+    window.addEventListener('resize', resize)
+    requestAnimationFrame(function loop(now) {
+      draw(now / 60000)
+      requestAnimationFrame(loop)
+    })
+  }
+</script>

@@ -1,0 +1,164 @@
+---
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import type { Lang } from '../i18n';
+import { t } from '../i18n';
+
+interface Props { lang: Lang; }
+const { lang } = Astro.props;
+const d = t(lang);
+
+const collectionName = lang === 'hr' ? 'projectsHr' : 'projectsEn';
+const all = await getCollection(collectionName, ({ data }) => !data.draft);
+const items = all.sort((a, b) => a.data.order - b.data.order);
+
+const projectsBase = lang === 'hr' ? '/projekti' : '/en/projects';
+---
+
+<section class="projects" id="projekti" aria-labelledby="projects-title">
+  <div class="inner">
+    <header class="sec-head">
+      <p class="t-eyebrow">{d.projects.eyebrow}</p>
+      <h2 id="projects-title" class="t-h1 title">{d.projects.title}</h2>
+      <p class="sub">{d.projects.sub}</p>
+    </header>
+
+    <ul class="grid">
+      {items.map((project, idx) => (
+        <li class="project-item">
+          <a href={`${projectsBase}/${project.id}/`} class="project" aria-label={project.data.title}>
+            <div class="project-body">
+              <span class="project-num t-eyebrow">{String(idx + 1).padStart(2, '0')}</span>
+              <h3 class="t-h2 project-title">{project.data.title}</h3>
+              <p class="project-summary">{project.data.summary}</p>
+              <ul class="tags">
+                {project.data.tags.map((tag) => (
+                  <li class="tag">{tag}</li>
+                ))}
+              </ul>
+              <span class="project-cta">
+                {d.projects.viewProject} <span class="arrow" aria-hidden="true">→</span>
+              </span>
+            </div>
+
+            {project.data.logo && (
+              <div class="project-logo">
+                <Image src={project.data.logo} alt={project.data.title} width={200} height={200} />
+              </div>
+            )}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .projects {
+    padding: var(--space-9) 0;
+  }
+  .inner {
+    max-width: var(--max-content);
+    margin: 0 auto;
+    padding: 0 var(--page-padding-x);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-7);
+  }
+  .sec-head { display: flex; flex-direction: column; gap: var(--space-3); }
+  .title { max-width: 18ch; }
+  .sub { color: var(--color-text); max-width: 56ch; font-size: 1.0625rem; }
+
+  .grid {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+  }
+  .project-item { margin: 0; padding: 0; }
+
+  /* Cijeli box je klikabilan link → otvara stranicu projekta. */
+  .project {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    border: var(--border-hairline) solid rgba(255, 255, 255, 0.10);
+    background: var(--color-smoked);
+    color: var(--color-fg);
+    text-decoration: none;
+    border-bottom: var(--border-hairline) solid rgba(255, 255, 255, 0.10);
+    padding-bottom: var(--space-6);
+    transition: border-color var(--transition-base);
+  }
+  .project:hover { opacity: 1; border-color: var(--color-border-strong); }
+  .project:hover .arrow { transform: translateX(4px); }
+
+  .project-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .project-num { color: var(--color-muted); }
+  .project-title { max-width: 30ch; }
+  .project-summary { color: var(--color-text); font-size: 1rem; line-height: 1.6; max-width: 60ch; }
+
+  .tags {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+  .tag {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+    padding: 4px 10px;
+    border: var(--border-hairline) solid var(--color-border-strong);
+    border-radius: var(--radius-xs);
+  }
+
+  .project-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-top: var(--space-2);
+    font-family: var(--font-body);
+    font-size: 0.9375rem;
+    color: var(--color-fg);
+  }
+  .project-cta .arrow {
+    display: inline-block;
+    transition: transform var(--transition-base);
+  }
+
+  /* Logo desno u boxu. */
+  .project-logo {
+    flex: 0 0 auto;
+    width: clamp(96px, 18vw, 160px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .project-logo :global(img) {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  @media (max-width: 720px) {
+    .project {
+      flex-direction: column-reverse;  /* logo iznad teksta na mobitelu */
+      align-items: flex-start;
+      padding: var(--space-5);
+      gap: var(--space-5);
+    }
+    .project-logo { width: clamp(80px, 30vw, 120px); }
+  }
+</style>

@@ -1,0 +1,179 @@
+/* =============================================================
+   INVERZ — GLOBALNI STILOVI
+   Reset + bazna tipografija na temelju tokena.
+   ============================================================= */
+
+@import './tokens.css';
+
+/* ---- Minimalni reset ------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html, body, h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd {
+  margin: 0;
+}
+
+ul, ol {
+  margin: 0;
+  padding: 0;
+}
+
+img, svg, video {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* ---- Bazna tipografija ----------------------------------- */
+html {
+  /* Backstop behind the fixed DotsBackground canvas (z-index: -1).
+     Single source of truth: --color-bg (#0a0a0a). */
+  background: var(--color-bg);
+  /* Sidreni linkovi (#kontakt, #usluge…) ne smiju završiti ispod fiksnog headera. */
+  scroll-padding-top: var(--header-h);
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  /* Transparent so the fixed dots canvas shows through; #111 backstop lives on <html>. */
+  background: transparent;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: var(--fw-regular);
+  letter-spacing: var(--ls-body);
+  min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  color: var(--color-fg);
+  font-weight: var(--fw-medium);
+}
+
+/* Razrede koje koristimo umjesto direktnih tagova kad treba
+   razdvojiti semantiku od veličine. */
+.t-display { font-size: var(--fs-display); line-height: var(--lh-display); letter-spacing: var(--ls-display); font-weight: var(--fw-medium); }
+.t-h1      { font-size: var(--fs-h1);      line-height: var(--lh-h1);      letter-spacing: var(--ls-h1); }
+.t-h2      { font-size: var(--fs-h2);      line-height: var(--lh-h2);      letter-spacing: var(--ls-h2); }
+.t-h3      { font-size: var(--fs-h3);      line-height: var(--lh-h3);      letter-spacing: var(--ls-h3); }
+.t-eyebrow {
+  font-family: var(--font-body);
+  font-size: var(--fs-h4);
+  line-height: var(--lh-h4);
+  letter-spacing: var(--ls-eyebrow);
+  text-transform: uppercase;
+  font-weight: var(--fw-medium);
+  color: var(--color-muted);
+}
+.t-body    { font-size: var(--fs-body);  line-height: var(--lh-body);  color: var(--color-text); }
+.t-small   { font-size: var(--fs-small); line-height: var(--lh-small); color: var(--color-muted); }
+
+/* ---- INVERZ wordmark — zajednički lockup (hero + header) -------------
+   Živi tekst (Syncopate 700, NATIVNA širina — bez scaleX) sa:
+     • crnim slovima (silueta),
+     • svijetlim glowom tik uz slova + tamnijim širim glowom,
+     • tamnom "pločom" iza cijelog wordmarka (::before, blurani gradijent).
+   Sve mjere su u `em` → skaliraju s font-size (hero veliki, header mali).
+
+   >>> OVDJE MIJENJAJ BROJEVE <<<  (sve su CSS varijable ispod).
+   Po želji pregazi pojedini knob po komponenti, npr:
+       .brand { --wm-color: var(--color-fg); }
+*/
+.inverz-wordmark {
+  /* === GLOW SLOVA — svijetli, tik uz rub ====================== */
+  --wm-glow-color: 201, 212, 226;          /* #c9d4e2  (R, G, B) */
+  --wm-glow-1-radius: 0.08em;  --wm-glow-1-opacity: 0.85;   /* unutarnji, najjači */
+  --wm-glow-2-radius: 0.18em;  --wm-glow-2-opacity: 0.50;   /* malo širi */
+  /* === GLOW SLOVA — tamni, širi ============================== */
+  --wm-glow-dark-color: 32, 38, 50;        /* #202632 */
+  --wm-glow-3-radius: 0.50em;  --wm-glow-3-opacity: 0.32;
+  --wm-glow-4-radius: 0.90em;  --wm-glow-4-opacity: 0.22;
+  /* === BACKING GLOW — tamna ploča iza cijelog wordmarka ====== */
+  --wm-back-color: 8, 11, 18;              /* tamnije od glowa slova */
+  --wm-back-opacity: 0.60;                 /* jačina tamnih (gornji/donji) rubova */
+  --wm-back-height: 0.78em;                /* ≈ cap height slova */
+  --wm-back-overhang: 0.30em;              /* preklop lijevo/desno preko "I" i "Z" (0.2–0.4em) */
+  --wm-back-blur: 0.35em;                  /* mekoća rubova — nikad oštar pravokutnik */
+  /* === SLOVA ================================================== */
+  --wm-letter-spacing: 0.16em;             /* razmak između slova */
+  --wm-color: #000;                        /* boja slova */
+
+  position: relative;
+  isolation: isolate;          /* drži ::before (z-index:-1) iza slova, a ne iza stranice */
+  display: inline-block;        /* nativna širina; NEMA scaleX */
+  font-family: 'Syncopate', sans-serif;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: var(--wm-letter-spacing);
+  color: var(--wm-color);
+  /* Glow slova: 1–2 svijetli (uz rub), 3–4 tamni (širi). */
+  text-shadow:
+    0 0 var(--wm-glow-1-radius) rgba(var(--wm-glow-color), var(--wm-glow-1-opacity)),
+    0 0 var(--wm-glow-2-radius) rgba(var(--wm-glow-color), var(--wm-glow-2-opacity)),
+    0 0 var(--wm-glow-3-radius) rgba(var(--wm-glow-dark-color), var(--wm-glow-3-opacity)),
+    0 0 var(--wm-glow-4-radius) rgba(var(--wm-glow-dark-color), var(--wm-glow-4-opacity));
+}
+/* Backing glow — jedan blurani gradijent, najtamniji gore/dolje, proziran u sredini. */
+.inverz-wordmark::before {
+  content: '';
+  position: absolute;
+  z-index: -1;                  /* ispod slova */
+  top: 50%;
+  transform: translateY(-50%);
+  /* Širina = bounding width + overhang sa svake strane. Desni inset uračunava
+     trailing letter-spacing iza zadnjeg "Z" pa ploča simetrično prelazi I/Z. */
+  left: calc(-1 * var(--wm-back-overhang));
+  right: calc(var(--wm-letter-spacing) - var(--wm-back-overhang));
+  height: var(--wm-back-height);
+  background: linear-gradient(
+    to bottom,
+    rgba(var(--wm-back-color), var(--wm-back-opacity)) 0%,
+    transparent 50%,
+    rgba(var(--wm-back-color), var(--wm-back-opacity)) 100%
+  );
+  filter: blur(var(--wm-back-blur));
+  pointer-events: none;
+}
+
+/* ---- Linkovi --------------------------------------------- */
+a {
+  color: var(--color-fg);
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-fg);
+  padding-bottom: 1px;
+  transition: opacity var(--transition-fast);
+}
+a:hover { opacity: 0.6; }
+a:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ---- Fokus za sve interaktivne ---------------------------- */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ---- Selekcija ------------------------------------------- */
+::selection {
+  background: var(--color-fg);
+  color: var(--color-bg);
+}

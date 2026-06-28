@@ -1,0 +1,19 @@
+---
+import PageLayout from '../../../layouts/PageLayout.astro';
+import PostsList from '../../../components/PostsList.astro';
+import { altLangUrl, t } from '../../../i18n';
+
+const lang = 'en';
+const altUrl = altLangUrl(lang, '/en/posts');
+const d = t(lang);
+---
+
+<PageLayout
+  lang={lang}
+  altUrl={altUrl}
+  title={`${d.postsPage.title} — INVERZ`}
+  description={d.postsPage.sub}
+  canonical="https://inverz.hr/en/posts/"
+>
+  <PostsList lang={lang} />
+</PageLayout>
