@@ -26,8 +26,8 @@
   const LENGTH  = 5
   const SCALE   = 600
   const MARGIN  = LENGTH * 2          // the edge fix
-  const CONTRAST  = 2    // >1 = more dark areas; raise for even darker (try 2–4)
-  const MAX_ALPHA = 0.14   // peak brightness of the lightest dots; lower = less white
+  const CONTRAST  = 2.2    // >1 = more dark areas; raise for even darker (try 2–4)
+  const MAX_ALPHA = 0.16   // peak brightness of the lightest dots; lower = less white
 
   // Boja točkica čita se iz tokena (jedno mjesto za izmjenu).
   const rootStyle = getComputedStyle(document.documentElement)
@@ -85,7 +85,7 @@
   } else {
     window.addEventListener('resize', resize)
     requestAnimationFrame(function loop(now) {
-      draw(now / 60000)
+      draw(now / 65000)
       requestAnimationFrame(loop)
     })
   }

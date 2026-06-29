@@ -17,7 +17,7 @@ export const siteConfig = {
    * (npr. '385991234567'). Generira link na obliku https://wa.me/385991234567.
    */
   contact: {
-    email: 'marinsmoljan7@gmail.com',     // privremeni osobni mail — zamijeni službenim mailom firme kad bude
+    email: 'kontakt@inverz.hr', 
     phone: '+385 95 834 6176',            // prikazna verzija (s razmacima)
     phoneRaw: '+385958346176',            // za tel: link (bez razmaka)
     whatsapp: '385958346176',             // za wa.me (bez plusa i razmaka)
@@ -35,7 +35,7 @@ export const siteConfig = {
   /**
    * Web3Forms — slanje kontakt forme bez vlastitog backenda.
    * Otvori web3forms.com, upiši svoj email i potvrdi ga, pa ovdje
-   * zalijepi Access Key (izgleda kao UUID: xxxxxxxx-xxxx-...).
+   * zalijepi Access Key.
    * Ključ je javan (smije biti u kodu) — vezan je samo na tvoj email.
    */
   web3forms: {
